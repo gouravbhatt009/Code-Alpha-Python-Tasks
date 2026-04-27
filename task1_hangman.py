@@ -1,146 +1,138 @@
 """
-CodeAlpha Internship - Task 1: Hangman Game
-Author: CodeAlpha Intern
-Description: A text-based Hangman game where the player guesses a word one letter at a time.
+Project Name: Hangman Game
+Author: [Your Name]
+Course: BCA Final Year
+Description: A classic word-guessing game built with Python.
 """
 
 import random
 
-# Predefined list of words
-WORDS = ["python", "developer", "hangman", "keyboard", "monitor"]
+# List of words for the game
+# In a real project, you could also load these from a text file
+words = ["python", "programming", "database", "network", "software", "security"]
 
-# Hangman visual stages (0 = full, 6 = empty)
-HANGMAN_STAGES = [
+# Visual representation of the hangman
+# Organized from 0 errors to 6 errors
+stages = [
     """
-   -----
-   |   |
-   O   |\
-   |
-  /|\\  |
-  / \\  |
+       ------
+       |    |
+       |    O
+       |   /|\\
+       |   / \\
        |
-=========
-""",
+    ---------
+    """,
     """
-   -----
-   |   |
-   O   |
-  /|\\  |
-  /    |
+       ------
+       |    |
+       |    O
+       |   /|\\
+       |   / 
        |
-=========
-""",
+    ---------
+    """,
     """
-   -----
-   |   |
-   O   |
-  /|\\  |
+       ------
+       |    |
+       |    O
+       |   /|\\
+       |    
        |
-       |
-=========
-""",
+    ---------
+    """,
     """
-   -----
-   |   |
-   O   |
-  /|   |
+       ------
+       |    |
+       |    O
+       |   /|
+       |    
        |
-       |
-=========
-""",
+    ---------
+    """,
     """
-   -----
-   |   |
-   O   |
-   |   |
+       ------
+       |    |
+       |    O
+       |    |
+       |    
        |
-       |
-=========
-""",
+    ---------
+    """,
     """
-   -----
-   |   |
-   O   |
+       ------
+       |    |
+       |    O
+       |    
+       |    
        |
-       |
-       |
-=========
-""",
+    ---------
+    """,
     """
-   -----
-   |   |
+       ------
+       |    |
+       |    
+       |    
+       |    
        |
-       |
-       |
-       |
-=========
-""",
+    ---------
+    """
 ]
 
-
-def display_status(word, guessed_letters, wrong_guesses):
-    """Display the current game status."""
-    print(HANGMAN_STAGES[6 - wrong_guesses])
-
-    # Show the word with blanks
-    display_word = " ".join(
-        letter if letter in guessed_letters else "_" for letter in word
-    )
-    print(f"  Word: {display_word}")
-    print(f"  Wrong guesses left: {6 - wrong_guesses}")
-
-    if guessed_letters:
-        wrong = [l for l in guessed_letters if l not in word]
-        if wrong:
-            print(f"  Incorrect letters: {', '.join(sorted(wrong))}")
-    print()
-
-
-def hangman():
-    """Main Hangman game function."""
-    print("=" * 40)
-    print("       WELCOME TO HANGMAN GAME!")
-    print("=" * 40)
-
-    word = random.choice(WORDS)
-    guessed_letters = set()
-    wrong_guesses = 0
-    max_wrong = 6
-
-    while wrong_guesses < max_wrong:
-        display_status(word, guessed_letters, wrong_guesses)
-
-        # Check win condition
-        if all(letter in guessed_letters for letter in word):
-            print(f"🎉 Congratulations! You guessed the word: '{word.upper()}'")
+def play_hangman():
+    # 1. Initialize Game State
+    chosen_word = random.choice(words).lower()
+    guessed_letters = []
+    attempts_left = 6
+    
+    print("--- Welcome to the Hangman Game! ---")
+    
+    # 2. Main Game Loop
+    while attempts_left > 0:
+        # Display the current status of the word
+        # Using a simple loop to build the display string
+        display_word = ""
+        for char in chosen_word:
+            if char in guessed_letters:
+                display_word += char + " "
+            else:
+                display_word += "_ "
+        
+        print(stages[attempts_left])
+        print(f"Word: {display_word}")
+        print(f"Attempts remaining: {attempts_left}")
+        print(f"Guessed so far: {', '.join(guessed_letters)}")
+        
+        # 3. Check if player has won
+        if "_" not in display_word:
+            print("\nCongratulations! You saved the man and guessed the word!")
             break
-
-        # Get player input
-        guess = input("  Enter a letter: ").strip().lower()
-
+            
+        # 4. Get User Input
+        guess = input("\nEnter a letter: ").lower()
+        
+        # Validation
         if len(guess) != 1 or not guess.isalpha():
-            print("  ⚠  Please enter a single valid letter.\n")
+            print("Invalid input. Please enter a single letter.")
             continue
-
+            
         if guess in guessed_letters:
-            print(f"  ⚠  You already guessed '{guess}'. Try another letter.\n")
+            print(f"You already guessed '{guess}'. Try again.")
             continue
-
-        guessed_letters.add(guess)
-
-        if guess in word:
-            print(f"  ✅ Good guess! '{guess}' is in the word.\n")
+            
+        # 5. Process the Guess
+        guessed_letters.append(guess)
+        
+        if guess in chosen_word:
+            print(f"Good job! '{guess}' is in the word.")
         else:
-            wrong_guesses += 1
-            remaining = max_wrong - wrong_guesses
-            print(f"  ❌ Wrong! '{guess}' is not in the word. {remaining} guesses left.\n")
-
-    else:
-        display_status(word, guessed_letters, wrong_guesses)
-        print(f"💀 Game Over! The word was: '{word.upper()}'")
-
-    print("\nThanks for playing Hangman!")
-
+            attempts_left -= 1
+            print(f"Sorry, '{guess}' is not there.")
+            
+    # 6. End of Game
+    if attempts_left == 0:
+        print(stages[0])
+        print(f"Game Over! The man was hanged. The word was: {chosen_word}")
 
 if __name__ == "__main__":
-    hangman()
+    play_hangman()
